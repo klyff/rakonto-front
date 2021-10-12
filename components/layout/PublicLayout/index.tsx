@@ -15,7 +15,7 @@ const PublicLayout: React.FC = ({ children }) => {
           maxWidth: matches ? 684 : '100%',
           width: '100%',
           minHeight: 755,
-          padding: `32px 5vw`,
+          padding: `72px 5vw`,
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
@@ -23,8 +23,8 @@ const PublicLayout: React.FC = ({ children }) => {
         }}
         component={matches ? Paper : 'div'}
       >
-        <Box paddingBottom={matches ? 18 : 10} textAlign="center" paddingTop={6}>
-          <Image src={'/images/logo2.svg'} width={238} alt="rakonto" />
+        <Box paddingBottom={5} textAlign="center">
+          <Image width={211} height={62} src={'/images/logo2.svg'} layout="fixed" alt="rakonto" />
         </Box>
         {children}
       </Box>

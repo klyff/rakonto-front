@@ -7,7 +7,7 @@ const CommentBox = styled('div')(({ theme }) => ({
   borderColor: theme.palette.grey['400'],
   cursor: 'text',
   padding: '16px',
-  borderRadius: '2px',
+  borderRadius: '4px',
   marginBottom: '1em',
   boxShadow: `inset 0 1px 8px -3px ${theme.palette.grey['300']}`
 }))

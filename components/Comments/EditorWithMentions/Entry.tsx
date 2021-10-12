@@ -1,8 +1,7 @@
-import React, { MouseEvent, ReactElement } from 'react'
+import React, { MouseEvent } from 'react'
 import { MentionData, MentionPluginTheme } from '@draft-js-plugins/mention'
 import Avatar from '@mui/material/Avatar'
 import initials from 'initials'
-import Box from '@mui/material/Box'
 
 export interface EntryComponentProps {
   className?: string

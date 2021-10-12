@@ -116,7 +116,7 @@ export default function PrimarySearchAppBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Image src={'/images/logo-withe.svg'} alt="rakonto" />
+          <Image width={135} height={40} src={'/images/logo-withe.svg'} layout="fixed" alt="rakonto" />
           <Box sx={{ display: { xs: 'none', md: 'flex' }, paddingLeft: 8 }}>
             {menuOptions.map(({ href, text, icon, name }, index) => {
               const isSelected = router.asPath.startsWith(href)

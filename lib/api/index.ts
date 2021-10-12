@@ -74,11 +74,13 @@ request.interceptors.response.use(
     return response
   },
   error => {
-    if (typeof window === 'undefined') return Promise.reject(error)
+    console.log('error: ', error)
+    if (typeof window === 'undefined') {
+      return Promise.reject(error)
+    }
     if (error.response.status === 401) {
       Cookies.remove('token')
     }
-
     return Promise.reject(error)
   }
 )

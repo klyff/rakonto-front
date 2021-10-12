@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 import Comment from './Comment'
 import { useCommentApi } from './useCommentApi'
 import CommentEditor from './CommentEditor'
+import Divider from '@mui/material/Divider'
 
 interface iComments {
   comments: CommentType[]
@@ -36,7 +37,9 @@ const Comments: React.FC<iComments> = ({ storyId, comments: initialComments, wat
         height: '100%'
       }}
     >
-      <Typography>Comments:</Typography>
+      <CommentEditor mentions={mentions} createAction={createComment} storyId={storyId} />
+      <Divider sx={{ margin: '16px 0px' }} />
+      <Typography>Comments</Typography>
       <List>
         {comments.map(comment => (
           <Comment
@@ -49,7 +52,6 @@ const Comments: React.FC<iComments> = ({ storyId, comments: initialComments, wat
           />
         ))}
       </List>
-      <CommentEditor mentions={mentions} createAction={createComment} storyId={storyId} />
     </Box>
   )
 }

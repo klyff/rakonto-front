@@ -1,10 +1,9 @@
-import React, { useRef, useState, useCallback, useContext } from 'react'
+import React, { useState, useCallback, useContext } from 'react'
 import { CommentType, CommentFormType } from '../../lib/types'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
-import Editor from '@draft-js-plugins/editor'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
@@ -17,7 +16,6 @@ import ShowMore from '../ShowMore'
 import EditorWithMentions from './EditorWithMentions'
 import { AxiosError } from 'axios'
 import { formatDistance, parseJSON } from 'date-fns'
-import CommentBox from './CommentBox'
 
 interface iComments {
   mentions?: MentionData[]
@@ -31,7 +29,6 @@ const Comment: React.FC<iComments> = ({ comment, editComment, deleteComment, men
   const { author } = comment
   const { actions: snackActions } = useContext(SimpleSnackbarContext)
   const user = useUser()
-  const ref = useRef<Editor>(null)
   const [editorState, setEditorState] = useState(
     EditorState.createWithContent(convertFromRaw(JSON.parse(comment.body)))
   )
@@ -47,7 +44,6 @@ const Comment: React.FC<iComments> = ({ comment, editComment, deleteComment, men
 
   const handleEdit = async () => {
     setIsEditing(true)
-    ref.current?.focus()
   }
 
   const handleCancel = async () => {
@@ -104,13 +100,7 @@ const Comment: React.FC<iComments> = ({ comment, editComment, deleteComment, men
           }
           secondary={
             isEditing ? (
-              <CommentBox
-                onClick={() => {
-                  ref.current?.focus()
-                }}
-              >
-                <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} ref={ref} />
-              </CommentBox>
+              <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} />
             ) : (
               <ShowMore lines={3}>
                 <EditorWithMentions readOnly={true} mentions={mentions} onChange={onChange} state={editorState} />

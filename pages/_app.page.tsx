@@ -13,6 +13,8 @@ import { AuthType } from '../lib/types'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Cookies from 'js-cookie'
+import { CircularProgress } from '@mui/material'
+import Box from '@mui/material/Box'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -33,7 +35,7 @@ const MyApp = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
       setAuthorized(false)
       router.push({
         pathname: '/u/signin',
-        query: { returnUrl: router.asPath }
+        query: { returnUrl: router.asPath === '/a/signout' ? '/' : router.asPath }
       })
     } else {
       setAuthorized(true)
@@ -71,7 +73,22 @@ const MyApp = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
         <CssBaseline />
         <SimpleSnackbarProvider>
           <SimpleDialogProvider>
-            <FormDialogProvider>{authorized && getLayout(<Component {...pageProps} />)}</FormDialogProvider>
+            <FormDialogProvider>
+              {authorized ? (
+                getLayout(<Component {...pageProps} />)
+              ) : (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                >
+                  <CircularProgress size={60} />
+                </Box>
+              )}
+            </FormDialogProvider>
           </SimpleDialogProvider>
         </SimpleSnackbarProvider>
       </ThemeProvider>

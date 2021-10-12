@@ -120,13 +120,16 @@ const Signin: NextPage = () => {
               </Box>
             </Grid>
             <Grid item xs={12}>
-              <Divider />
+              <Divider>or</Divider>
             </Grid>
             <Grid item xs={12}>
               <FacebookButton />
             </Grid>
             <Grid item xs={12}>
               <GoogleButton />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider />
             </Grid>
             <Grid item xs={12}>
               <Button href={'/u/signup'} variant="outlined" fullWidth>

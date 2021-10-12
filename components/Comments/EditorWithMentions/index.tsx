@@ -1,20 +1,28 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import createMentionPlugin, { defaultSuggestionsFilter, MentionData } from '@draft-js-plugins/mention'
-import mentionsStyles from './MentionsStyles.module.css'
 import Entry from './Entry'
 import Editor from '@draft-js-plugins/editor'
 import { EditorState } from 'draft-js'
+import CommentBox from './CommentBox'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
 
 interface iMention {
   mentions?: MentionData[]
   state: EditorState
   onChange: (state: EditorState) => void
   readOnly?: boolean
-  ref?: React.ForwardedRef<Editor>
 }
 
+const DraftField = React.forwardRef<Editor, any>(function DraftField(props, ref) {
+  const { component: Component, editorRef, handleOnChange, ...rest } = props
+
+  return <Component {...rest} ref={editorRef} onChange={handleOnChange} />
+})
+
 const EditorWithMentions: React.FC<iMention> = React.forwardRef<Editor, iMention>(
-  ({ mentions, state, onChange, readOnly }, ref) => {
+  ({ mentions, state, onChange, readOnly }) => {
+    const ref = useRef<Editor>(null)
     const [open, setOpen] = useState(false)
     const [suggestions, setSuggestions] = useState(mentions || [])
     const { MentionSuggestions, plugins } = useMemo(() => {
@@ -36,7 +44,7 @@ const EditorWithMentions: React.FC<iMention> = React.forwardRef<Editor, iMention
       setSuggestions(defaultSuggestionsFilter(value, mentions || []))
     }, [])
 
-    const MentionComponent = (
+    const mentionComponent = (
       <MentionSuggestions
         open={open}
         onOpenChange={onOpenChange}
@@ -49,15 +57,26 @@ const EditorWithMentions: React.FC<iMention> = React.forwardRef<Editor, iMention
 
     return (
       <>
-        <Editor
-          readOnly={readOnly}
-          editorKey={'editor'}
-          editorState={state}
-          onChange={onChange}
-          plugins={plugins}
-          ref={ref}
-        />
-        {MentionComponent}
+        <div
+          onClick={() => {
+            ref?.current?.focus()
+          }}
+        >
+          <Box component={Typography} sx={{ paddingBottom: 1 }}>
+            Add a comment
+          </Box>
+          <CommentBox>
+            <Editor
+              readOnly={readOnly}
+              editorKey="editor"
+              editorState={state}
+              onChange={onChange}
+              plugins={plugins}
+              ref={ref}
+            />
+          </CommentBox>
+          {mentionComponent}
+        </div>
       </>
     )
   }

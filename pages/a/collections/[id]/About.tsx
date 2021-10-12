@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import ShowMore from '../../../../components/ShowMore'
+import Comments from '../../../../components/Comments'
 
 interface iAbout {
   title: string
@@ -12,21 +13,33 @@ interface iAbout {
 const About: React.FC<iAbout> = ({ title, description }) => {
   return (
     <Box
-      component={Paper}
       sx={{
         width: '100%',
-        padding: 1
+        display: 'flex'
       }}
     >
-      <Typography variant="h3">{title}</Typography>
-      <Typography variant="h4" gutterBottom>
-        {'subtitle'}
-      </Typography>
-      <ShowMore lines={3}>
-        <Typography variant="h6" paragraph>
+      <Box
+        component={Paper}
+        sx={{
+          width: '100%',
+          padding: 3
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          {title}
+        </Typography>
+        <Typography variant="h5" paragraph>
           {'    ' + description}
         </Typography>
-      </ShowMore>
+      </Box>
+      <Box
+        sx={{
+          minWidth: '448px',
+          paddingLeft: 1
+        }}
+      >
+        <Comments storyId={'123'} comments={[]} watchers={[]} />
+      </Box>
     </Box>
   )
 }
