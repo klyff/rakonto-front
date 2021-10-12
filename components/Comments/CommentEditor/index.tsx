@@ -46,7 +46,7 @@ const CommentEditor: React.FC<iCommentEditor> = ({ storyId, mentions, createActi
       <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} />
       <Box sx={{ display: 'flex', justifyContent: 'end' }}>
         <Button variant="outlined" onClick={handleSave}>
-          Send comment
+          Comment
         </Button>
       </Box>
     </>

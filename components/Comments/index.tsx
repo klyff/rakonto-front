@@ -33,7 +33,7 @@ const Comments: React.FC<iComments> = ({ storyId, comments: initialComments, wat
       component={Paper}
       sx={{
         width: '100%',
-        padding: 1,
+        padding: 3,
         height: '100%'
       }}
     >

@@ -2,7 +2,6 @@ import React from 'react'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
-import ShowMore from '../../../../components/ShowMore'
 import Comments from '../../../../components/Comments'
 
 interface iAbout {
