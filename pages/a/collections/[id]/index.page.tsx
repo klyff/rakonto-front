@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import AuthenticatedLayout from '../../../../components/layout/AuthenticatedLayout'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import {
   CollectionType,
   FileType,
@@ -21,6 +21,8 @@ import About from './About'
 import TabPanel from '@mui/lab/TabPanel'
 import Peoples from './Peoples'
 import Timelines from './Timelines'
+import withSession from '../../../../lib/withSession'
+import fetchJson from '../../../../lib/fetchJson'
 
 interface iCollection {
   collection: CollectionType
@@ -102,10 +104,15 @@ Collection.getLayout = function getLayout(page) {
   return <AuthenticatedLayout>{page}</AuthenticatedLayout>
 }
 
-Collection.getInitialProps = async ({ req, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   // @ts-ignore
-  const { token } = cookieParser(req?.headers.cookie)
-  const collection = await api(token).getCollection(query.id as string)
+  const { Authorization } = withSession(req, res)
+  // @ts-ignore
+  const collection = await fetchJson<CollectionType>(`${process.env.NEXT_PUBLIC_API}/api/a/collections/${params.id}`, {
+    method: 'GET',
+    headers: { Authorization }
+  })
+
   const accumulator = collection.stories.reduce<{
     persons: PersonType[]
     files: FileType[]
@@ -129,7 +136,7 @@ Collection.getInitialProps = async ({ req, query }) => {
       timelineEntries: []
     }
   )
-  return { collection, ...accumulator }
+  return { props: { collection, ...accumulator } }
 }
 
 export default Collection

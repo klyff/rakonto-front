@@ -5,7 +5,7 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import { Formik, Form } from 'formik'
 import schema from './schema'
-import { api } from '../../../lib/api'
+import fetchJson from '../../../lib/fetchJson'
 import { AxiosError } from 'axios'
 import { SimpleDialogContext } from '../../../components/SimpleDialog'
 import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
@@ -22,27 +22,29 @@ const PasswordReset: React.FC = () => {
 
   const handleSubmit = async ({ password, confirmation, token }: PasswordResetForm) => {
     try {
-      await api().passwordReset({ password, confirmation, token })
+      await fetchJson(`/api/u/password-reset/${token}`, {
+        body: JSON.stringify({ password, confirmation }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
       dialogActions.open('Password changed', <>Your password has been reseted.</>)
       router.push('/u/signin')
     } catch (error) {
-      const isAxiosError = (candidate: any): candidate is AxiosError => {
-        return candidate.isAxiosError === true
-      }
-
-      if (isAxiosError(error)) {
-        if (error?.response?.data.code === '1003') {
+      // @ts-ignore
+      const { data } = error
+      if (data) {
+        if (data.code === '1003') {
           dialogActions.open('Password change', <>This link to change the password has expired. Please try again!</>)
           router.push('/u/signin')
           return
         }
 
-        if (error?.response?.data.code === '1002') {
+        if (data.code === '1002') {
           dialogActions.open('Password change', <>This link not exists.</>)
           router.push('/u/signin')
           return
         }
-        snackActions.open(error?.response?.data.message)
+        snackActions.open(data.message)
         return
       }
       snackActions.open('Something was wrong! please try again.')

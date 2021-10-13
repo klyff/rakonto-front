@@ -1,6 +1,5 @@
 import React from 'react'
 import Grid from '@mui/material/Grid'
-import { api } from '../../../lib/api'
 import { NextPage } from 'next'
 import { StoryType } from '../../../lib/types'
 import useInfiniteScroll from '../../../components/hooks/useInfiniteScrool'
@@ -13,7 +12,7 @@ import Typography from '@mui/material/Typography'
 const Stories: NextPage = () => {
   const { loading, items, hasNextPage, error, loadMore } = usePageableRequest<StoryType>({
     size: 15,
-    request: api().getStories
+    url: '/api/a/stories'
   })
 
   const [sentryRef] = useInfiniteScroll({

@@ -5,8 +5,7 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import { Formik, Form } from 'formik'
 import schema from './schema'
-import { api } from '../../../lib/api'
-import { AxiosError } from 'axios'
+import fetchJson from '../../../lib/fetchJson'
 import { SimpleDialogContext } from '../../../components/SimpleDialog'
 import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
 import { useRouter } from 'next/router'
@@ -19,16 +18,18 @@ const ForgotPassword: React.FC = () => {
 
   const handleSubmit = async ({ email }: { email: string }) => {
     try {
-      await api().requestPasswordReset(email)
+      await fetchJson('/api/u/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
       dialogActions.open('Forgot Password', 'We sent you an email with a link to reset your password.')
       router.push('/u/signin')
     } catch (error) {
-      const isAxiosError = (candidate: any): candidate is AxiosError => {
-        return candidate.isAxiosError === true
-      }
-
-      if (isAxiosError(error)) {
-        snackActions.open(error?.response?.data.message)
+      // @ts-ignore
+      const { data } = error
+      if (data) {
+        snackActions.open(data)
         return
       }
       snackActions.open('Something was wrong! please try again.')

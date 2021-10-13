@@ -1,16 +1,14 @@
 import React from 'react'
 import AuthenticatedLayout from '../../../../components/layout/AuthenticatedLayout'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import { StoryType } from '../../../../lib/types'
-import { api } from '../../../../lib/api'
-import cookieParser from '../../../../lib/cookieParser'
 import Player from '../../../../components/Player'
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import TabsArea from './TabsArea'
 import About from './About'
 import Comments from '../../../../components/Comments'
-import useWindowDimensions from '../../../../components/hooks/useWindowsDimensions'
+import fetchJson from '../../../../lib/fetchJson'
+import withSession from '../../../../lib/withSession'
 
 interface iStory {
   story: StoryType
@@ -50,11 +48,15 @@ Story.getLayout = function getLayout(page) {
   return <AuthenticatedLayout>{page}</AuthenticatedLayout>
 }
 
-Story.getInitialProps = async ({ req, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   // @ts-ignore
-  const { token } = cookieParser(req?.headers.cookie)
-  const story = await api(token).getStory(query.id as string)
-  return { story }
+  const { Authorization } = withSession(req, res)
+  // @ts-ignore
+  const story = await fetchJson<StoryType>(`${process.env.NEXT_PUBLIC_API}/api/a/stories/${params.id}`, {
+    method: 'GET',
+    headers: { Authorization }
+  })
+  return { props: { story } }
 }
 
 export default Story

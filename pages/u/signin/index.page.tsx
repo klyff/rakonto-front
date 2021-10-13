@@ -4,15 +4,15 @@ import PublicLayout from '../../../components/layout/PublicLayout'
 import { Form, Formik } from 'formik'
 import schema from './schema'
 import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
+import LoadingButton from '@mui/lab/LoadingButton'
 import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { SigninFormType } from '../../../lib/types'
-import { api } from '../../../lib/api'
-import { AxiosError } from 'axios'
+import fetchJson from '../../../lib/fetchJson'
 import { SimpleDialogContext } from '../../../components/SimpleDialog'
 import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
 import FacebookButton from './FacebookButton'
@@ -21,12 +21,17 @@ import Cookies from 'js-cookie'
 
 const Signin: NextPage = () => {
   const router = useRouter()
+  const [logging, setLognin] = useState<boolean>(false)
   const { actions: dialogActions } = useContext(SimpleDialogContext)
   const { actions: snackActions } = useContext(SimpleSnackbarContext)
 
   const handleResend = async (email: string) => {
     try {
-      await api().requestConfirmEmail(email)
+      await fetchJson('/api/u/confirmation-email', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+        headers: { 'Content-Type': 'application/json' }
+      })
       dialogActions.close()
     } catch (error) {
       dialogActions.open(
@@ -42,9 +47,14 @@ const Signin: NextPage = () => {
   }
 
   const handleSubmit = async ({ email, password }: SigninFormType) => {
+    setLognin(true)
     try {
-      const userInfo = await api().signin({ email, password })
-      Cookies.set('token', userInfo.token)
+      const userInfo = await fetchJson('/api/u/auth/signin', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      await Cookies.set('token', userInfo.token)
       Cookies.set('user', JSON.stringify(userInfo.user))
       if (router.query.returnUrl) {
         await router.push(router.query.returnUrl as string)
@@ -52,16 +62,14 @@ const Signin: NextPage = () => {
       }
       await router.push('/a/my-libary')
     } catch (error) {
-      const isAxiosError = (candidate: any): candidate is AxiosError => {
-        return candidate.isAxiosError === true
-      }
-
-      if (isAxiosError(error)) {
-        if (error?.response?.data.code === '1004') {
+      // @ts-ignore
+      const { data } = error
+      if (data) {
+        if (data.code === '1004') {
           snackActions.open('Email or password are incorrect. Please try again')
           return
         }
-        if (error?.response?.data.code === '1005') {
+        if (data.code === '1005') {
           dialogActions.open(
             'Verify Email',
             <>
@@ -75,9 +83,11 @@ const Signin: NextPage = () => {
           )
           return
         }
-        snackActions.open(error?.response?.data.message)
+        snackActions.open(data.message)
       }
+      snackActions.open('Something was wrong! please try again.')
     }
+    setLognin(false)
   }
 
   const initialValues: SigninFormType = { email: '', password: '' }
@@ -112,9 +122,16 @@ const Signin: NextPage = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button color={'primary'} variant="contained" fullWidth type="submit" size="large">
+              <LoadingButton
+                color={'primary'}
+                variant="contained"
+                loading={isSubmitting}
+                fullWidth
+                type="submit"
+                size="large"
+              >
                 Login
-              </Button>
+              </LoadingButton>
               <Box paddingTop={2.5}>
                 <Link href="/u/forgot-password">Forgot Password</Link>
               </Box>
@@ -132,9 +149,9 @@ const Signin: NextPage = () => {
               <Divider />
             </Grid>
             <Grid item xs={12}>
-              <Button href={'/u/signup'} variant="outlined" fullWidth>
+              <LoadingButton href={'/u/signup'} variant="outlined" fullWidth>
                 Create new Account
-              </Button>
+              </LoadingButton>
             </Grid>
           </Grid>
         </Form>

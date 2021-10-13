@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { api } from '../../../lib/api'
+import fetchJson from '../../../lib/fetchJson'
 
 const Signout: React.FC = () => {
   const router = useRouter()
@@ -8,13 +8,15 @@ const Signout: React.FC = () => {
   useEffect(() => {
     const doLogout = async () => {
       try {
-        await api().singout()
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
-        router.push('/u/signin')
+        await fetchJson('/api/a/auth/signout', {
+          method: 'POST'
+        })
       } catch (error) {
         console.log(error)
       }
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+      router.push('/u/signin')
     }
     doLogout()
   }, [])

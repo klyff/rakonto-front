@@ -66,7 +66,7 @@ import {
 import Cookies from 'js-cookie'
 
 const request = axios.create({
-  baseURL: '/api/'
+  baseURL: `${process.env.NEXT_PUBLIC_API}/api/`
 })
 
 request.interceptors.response.use(
@@ -87,7 +87,7 @@ request.interceptors.response.use(
 
 export const api = (token?: string) => {
   if (token) {
-    request.defaults.baseURL = `http://localhost:3000/api/`
+    request.defaults.baseURL = process.env.NEXT_PUBLIC_API
   } else {
     token = Cookies.get('token')
   }

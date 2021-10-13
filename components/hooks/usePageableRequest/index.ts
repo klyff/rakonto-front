@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 import { Pageable } from '../../../lib/types'
+import fetchJson from '../../../lib/fetchJson'
+import { stringify } from 'qs'
 
 export interface Item {
   key: number
@@ -8,10 +10,10 @@ export interface Item {
 
 export const usePageableRequest = <T>({
   size,
-  request
+  url
 }: {
   size: number
-  request: (page: number, size: number, q?: string) => Promise<Pageable<T>>
+  url: string
 }): {
   loading: boolean
   items: T[]
@@ -30,7 +32,8 @@ export const usePageableRequest = <T>({
   async function reload(q?: string) {
     setLoading(true)
     try {
-      const { content, last } = await request(0, size, q)
+      const query = stringify({ page: 0, size, q }, { addQueryPrefix: true })
+      const { content, last } = await fetchJson<Pageable<T>>(`${url}${query}`)
       setPage(0)
       setItems(content)
       setHasNextPage(!last)
@@ -45,7 +48,8 @@ export const usePageableRequest = <T>({
   async function loadMore(q?: string) {
     setLoading(true)
     try {
-      const { content, last } = await request(page, size, q)
+      const query = stringify({ page, size, q }, { addQueryPrefix: true })
+      const { content, last } = await fetchJson<Pageable<T>>(`${url}${query}`)
       setPage(page + 1)
       setItems(current => [...current, ...content])
       setHasNextPage(!last)

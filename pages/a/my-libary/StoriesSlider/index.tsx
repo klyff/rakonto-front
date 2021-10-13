@@ -11,7 +11,7 @@ import StoryCard from '../../../../components/StoryCard'
 const StoriesSliderTile: NextPage = () => {
   const { loading, items, hasNextPage, error, loadMore } = usePageableRequest<StoryType>({
     size: 15,
-    request: api().getStories
+    url: '/api/a/stories'
   })
 
   const [sentryRef] = useInfiniteScroll({

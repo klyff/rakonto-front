@@ -11,7 +11,7 @@ import CollectionCard from '../../../../components/CollectionCard'
 const CollectionsSlider: NextPage = () => {
   const { loading, items, hasNextPage, error, loadMore } = usePageableRequest<CollectionType>({
     size: 15,
-    request: api().getCollections
+    url: '/api/a/collections'
   })
 
   const [sentryRef] = useInfiniteScroll({

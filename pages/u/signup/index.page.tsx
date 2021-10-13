@@ -13,6 +13,7 @@ import { AxiosError } from 'axios'
 import { SimpleDialogContext } from '../../../components/SimpleDialog'
 import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
 import Divider from '@mui/material/Divider'
+import fetchJson from '../../../lib/fetchJson'
 
 const Signup: NextPage = () => {
   const router = useRouter()
@@ -21,23 +22,26 @@ const Signup: NextPage = () => {
 
   const handleSubmit = async ({ email, firstName, lastName, password, confirmation }: SingupFormType) => {
     try {
-      await api().singup({ email, firstName, lastName, password, confirmation })
+      await fetchJson('/api/u/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify({ email, firstName, lastName, password, confirmation }),
+        headers: { 'Content-Type': 'application/json' }
+      })
       router.push('/u/signin')
       dialogActions.open('Confirm email', 'We sent an email to you to confirm your account. Please check this.', {
         cancelText: 'Close'
       })
     } catch (error) {
-      const isAxiosError = (candidate: any): candidate is AxiosError => {
-        return candidate.isAxiosError === true
-      }
-      console.log(error)
-      if (isAxiosError(error)) {
+      // @ts-ignore
+      const { data } = error
+      if (data) {
         if (error?.response?.data.code === '1001') {
           snackActions.open('Email is already taken.')
           return
         }
-        snackActions.open(error?.response?.data.message)
+        snackActions.open(data.message)
       }
+      snackActions.open('Something was wrong! please try again.')
     }
   }
 

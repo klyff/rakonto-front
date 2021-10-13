@@ -9,6 +9,8 @@ import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
 import { FormDialogContext } from '../../../components/FormDialog'
 import { useRouter } from 'next/router'
 import { AxiosError } from 'axios'
+import fetchJson from '../../../lib/fetchJson'
+import { AuthType } from '../../../lib/types'
 
 const ConfirmationEmail: React.FC = () => {
   const router = useRouter()
@@ -16,7 +18,6 @@ const ConfirmationEmail: React.FC = () => {
   const { actions: dialogActions } = useContext(SimpleDialogContext)
   const { actions: snackActions } = useContext(SimpleSnackbarContext)
   const { actions: formDialogActions } = useContext(FormDialogContext)
-  const [showLoading, setShowLoading] = useState<boolean>(false)
 
   const handleSubmit = async ({ email }: FormikValues) => {
     try {
@@ -32,8 +33,9 @@ const ConfirmationEmail: React.FC = () => {
     if (!confirmationToken) return
     const confirm = async () => {
       try {
-        setShowLoading(true)
-        const { user, token } = await api().confirmEmail(confirmationToken as string)
+        const { user, token } = await fetchJson<AuthType>(`/api/u/confirmation-email/${confirmationToken}`, {
+          method: 'POST'
+        })
         setShowLoading(false)
         localStorage.setItem('user', JSON.stringify(user))
         localStorage.setItem('token', JSON.stringify(token))
@@ -46,13 +48,10 @@ const ConfirmationEmail: React.FC = () => {
         )
         router.push('/a/my-libary')
       } catch (error) {
-        setShowLoading(false)
-        const isAxiosError = (candidate: any): candidate is AxiosError => {
-          return candidate.isAxiosError === true
-        }
-
-        if (isAxiosError(error)) {
-          if (error?.response?.data.code === '1003') {
+        // @ts-ignore
+        const { data } = error
+        if (data) {
+          if (data.code === '1003') {
             formDialogActions.open(
               'Expired link',
               'This link has expired. Please enter your email address to resend another link to you to confirm your account.',
@@ -63,7 +62,7 @@ const ConfirmationEmail: React.FC = () => {
               { okText: 'Submit', cancelText: 'Close' }
             )
           }
-          if (error?.response?.data.code === '1002') {
+          if (data.code === '1002') {
             //TODO TypeError
             dialogActions.open(
               'Confirm email',
@@ -74,9 +73,10 @@ const ConfirmationEmail: React.FC = () => {
             )
             router.push('/u/signin')
           }
-          snackActions.open(error?.response?.data.message)
+          snackActions.open(data.message)
           return
         }
+        snackActions.open('Something was wrong! please try again.')
       }
     }
     confirm()
