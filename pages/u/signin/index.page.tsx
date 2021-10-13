@@ -60,7 +60,7 @@ const Signin: NextPage = () => {
         await router.push(router.query.returnUrl as string)
         return
       }
-      await router.push('/a/my-libary')
+      await router.push('/a/my-library')
     } catch (error) {
       // @ts-ignore
       const { data } = error

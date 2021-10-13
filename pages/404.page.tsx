@@ -30,7 +30,7 @@ const NotFound: React.FC = () => {
       <Typography gutterBottom align="center" variant="h5">
         THE PAGE YOU WERE LOOKING FOR DOES NOT EXIST
       </Typography>
-      <Link sx={{ textAlign: 'center', fontSize: '1.5em' }} href="/a/my-libary">
+      <Link sx={{ textAlign: 'center', fontSize: '1.5em' }} href="/a/my-library">
         Go to home
       </Link>
     </Box>

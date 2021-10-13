@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import AuthenticatedLayout from '../../../../components/layout/AuthenticatedLayout'
 import { GetServerSideProps, NextPage } from 'next'
+import Head from 'next/head'
 import {
   CollectionType,
   FileType,
@@ -8,11 +9,8 @@ import {
   LinkType,
   PersonType,
   StoryType,
-  TimelineType,
-  TranscriptionType
+  TimelineType
 } from '../../../../lib/types'
-import { api } from '../../../../lib/api'
-import cookieParser from '../../../../lib/cookieParser'
 import Player from '../../../../components/Player'
 import Cover from '../../../../components/Cover'
 import Box from '@mui/material/Box'
@@ -44,58 +42,67 @@ const Collection: NextPage<iCollection> = ({ collection, timelineEntries, person
   }
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        maxHeight: `720px`,
-        display: 'flex',
-        flexFlow: 'column'
-      }}
-    >
-      <Box sx={{ width: '100%', height: '100%', margin: `8px 0` }}>
-        {play ? (
-          <Player
-            subtitles={selectedStory?.subtitles || []}
-            type={selectedStory?.type}
-            media={selectedStory?.video || selectedStory?.audio}
-            cover={selectedStory?.thumbnail}
-            autoplay
-          />
-        ) : (
-          <Cover
-            author={collection.owner}
-            src={thumbnail}
-            title={title}
-            description={description}
-            onClick={handlePlay}
-          />
-        )}
-      </Box>
+    <>
+      <Head>
+        <title>Rakonto - {collection.title}</title>
+        <meta property="description" content={collection.description || ''} />
+        <meta property="creator" content={collection.owner.firstName || ''} />
+        <meta property="publisher" content={'Rakonto'} />
+        <meta property="og:image" content={collection.thumbnail} />
+      </Head>
       <Box
         sx={{
-          width: '100%'
+          width: '100%',
+          maxHeight: `720px`,
+          display: 'flex',
+          flexFlow: 'column'
         }}
       >
-        <TabsArea>
-          <TabPanel value="stories">
-            <Peoples persons={persons} />
-          </TabPanel>
-          <TabPanel value="about">
-            <About title={title} description={description} />
-          </TabPanel>
-          <TabPanel value="peoples">
-            <Peoples persons={persons} />
-          </TabPanel>
-          <TabPanel value="timelines">
-            <Timelines timelines={timelineEntries} />
-          </TabPanel>
-          <TabPanel value="places">places</TabPanel>
-          <TabPanel value="photos">photos</TabPanel>
-          <TabPanel value="files">files</TabPanel>
-          <TabPanel value="links">links</TabPanel>
-        </TabsArea>
+        <Box sx={{ width: '100%', height: '100%', margin: `8px 0` }}>
+          {play ? (
+            <Player
+              subtitles={selectedStory?.subtitles || []}
+              type={selectedStory?.type}
+              media={selectedStory?.video || selectedStory?.audio}
+              cover={selectedStory?.thumbnail}
+              autoplay
+            />
+          ) : (
+            <Cover
+              author={collection.owner}
+              src={thumbnail}
+              title={title}
+              description={description}
+              onClick={handlePlay}
+            />
+          )}
+        </Box>
+        <Box
+          sx={{
+            width: '100%'
+          }}
+        >
+          <TabsArea>
+            <TabPanel value="stories">
+              <Peoples persons={persons} />
+            </TabPanel>
+            <TabPanel value="about">
+              <About title={title} description={description} />
+            </TabPanel>
+            <TabPanel value="peoples">
+              <Peoples persons={persons} />
+            </TabPanel>
+            <TabPanel value="timelines">
+              <Timelines timelines={timelineEntries} />
+            </TabPanel>
+            <TabPanel value="places">places</TabPanel>
+            <TabPanel value="photos">photos</TabPanel>
+            <TabPanel value="files">files</TabPanel>
+            <TabPanel value="links">links</TabPanel>
+          </TabsArea>
+        </Box>
       </Box>
-    </Box>
+    </>
   )
 }
 
@@ -107,11 +114,30 @@ Collection.getLayout = function getLayout(page) {
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   // @ts-ignore
   const { Authorization } = withSession(req, res)
-  // @ts-ignore
-  const collection = await fetchJson<CollectionType>(`${process.env.NEXT_PUBLIC_API}/api/a/collections/${params.id}`, {
-    method: 'GET',
-    headers: { Authorization }
-  })
+
+  if (!Authorization) {
+    return {
+      redirect: {
+        destination: '/u/signin',
+        permanent: false
+      }
+    }
+  }
+
+  const collection = await fetchJson<CollectionType>(
+    // @ts-ignore
+    `${process.env.NEXT_PUBLIC_LOCAL_CONTEXT}/api/a/collections/${params.id}`,
+    {
+      method: 'GET',
+      headers: { Authorization }
+    }
+  )
+
+  if (!collection) {
+    return {
+      notFound: true
+    }
+  }
 
   const accumulator = collection.stories.reduce<{
     persons: PersonType[]
@@ -136,6 +162,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
       timelineEntries: []
     }
   )
+
   return { props: { collection, ...accumulator } }
 }
 

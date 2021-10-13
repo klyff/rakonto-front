@@ -90,10 +90,10 @@ export default function PrimarySearchAppBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem href="/a/my-libary">
+      <MenuItem href="/a/my-library">
         <MailIcon>My Libary</MailIcon>
       </MenuItem>
-      <MenuItem href="/a/my-libary">
+      <MenuItem href="/a/my-library">
         <MailIcon>My Libary</MailIcon>
       </MenuItem>
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
@@ -102,7 +102,7 @@ export default function PrimarySearchAppBar() {
   )
 
   const menuOptions = [
-    { name: 'my-libary', href: '/a/my-libary', icon: <HomeIcon />, text: 'My Libary' },
+    { name: 'my-library', href: '/a/my-library', icon: <HomeIcon />, text: 'My Library' },
     { name: 'stories', href: '/a/stories', icon: <MovieIcon />, text: 'Stories' },
     { name: 'collections', href: '/a/collections', icon: <FolderSpecialIcon />, text: 'Collections' },
     { name: 'peoplee', href: '/a/peoplee', icon: <PeopleAltIcon />, text: 'People' },

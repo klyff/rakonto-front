@@ -7,7 +7,7 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/a/my-libary',
+        destination: '/a/my-library',
         permanent: true,
       },
     ]

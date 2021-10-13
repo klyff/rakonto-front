@@ -15,6 +15,8 @@ export default async function fetchJson<T>(input: RequestInfo, init?: RequestIni
     error.response = response
     // @ts-ignore
     error.data = data
+    // @ts-ignore
+    error.status = response.status
     throw error
   } catch (error) {
     // @ts-ignore

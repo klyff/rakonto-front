@@ -9,6 +9,7 @@ import About from './About'
 import Comments from '../../../../components/Comments'
 import fetchJson from '../../../../lib/fetchJson'
 import withSession from '../../../../lib/withSession'
+import Head from 'next/head'
 
 interface iStory {
   story: StoryType
@@ -19,27 +20,36 @@ const Story: NextPage<iStory> = ({ story }) => {
     story
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        maxHeight: `720px`,
-        display: 'flex',
-        flexFlow: 'column'
-      }}
-    >
-      <Box sx={{ width: '100%', height: '100%', margin: `8px 0` }}>
-        <Player subtitles={subtitles || []} type={type} media={video || audio} cover={thumbnail} />
-      </Box>
+    <>
+      <Head>
+        <title>Rakonto - {story.title}</title>
+        <meta property="description" content={story.description || ''} />
+        <meta property="creator" content={story.owner.firstName || ''} />
+        <meta property="publisher" content={'Rakonto'} />
+        <meta property="og:image" content={story.thumbnail} />
+      </Head>
       <Box
         sx={{
-          width: '100%'
+          width: '100%',
+          maxHeight: `720px`,
+          display: 'flex',
+          flexFlow: 'column'
         }}
       >
-        <About description={description} owner={owner} title={title} collections={collections} />
-        <Comments comments={comments} watchers={watchers} storyId={id} />
-        <TabsArea story={story} />
+        <Box sx={{ width: '100%', height: '100%', margin: `8px 0` }}>
+          <Player subtitles={subtitles || []} type={type} media={video || audio} cover={thumbnail} />
+        </Box>
+        <Box
+          sx={{
+            width: '100%'
+          }}
+        >
+          <About description={description} owner={owner} title={title} collections={collections} />
+          <Comments comments={comments} watchers={watchers} storyId={id} />
+          <TabsArea story={story} />
+        </Box>
       </Box>
-    </Box>
+    </>
   )
 }
 
@@ -51,11 +61,28 @@ Story.getLayout = function getLayout(page) {
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   // @ts-ignore
   const { Authorization } = withSession(req, res)
+
+  if (!Authorization) {
+    return {
+      redirect: {
+        destination: '/u/signin',
+        permanent: false
+      }
+    }
+  }
+
   // @ts-ignore
-  const story = await fetchJson<StoryType>(`${process.env.NEXT_PUBLIC_API}/api/a/stories/${params.id}`, {
+  const story = await fetchJson<StoryType>(`${process.env.NEXT_PUBLIC_LOCAL_CONTEXT}/api/a/stories/${params.id}`, {
     method: 'GET',
     headers: { Authorization }
   })
+
+  if (!story) {
+    return {
+      notFound: true
+    }
+  }
+
   return { props: { story } }
 }
 

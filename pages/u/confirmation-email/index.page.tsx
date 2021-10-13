@@ -8,7 +8,6 @@ import { SimpleDialogContext } from '../../../components/SimpleDialog'
 import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
 import { FormDialogContext } from '../../../components/FormDialog'
 import { useRouter } from 'next/router'
-import { AxiosError } from 'axios'
 import fetchJson from '../../../lib/fetchJson'
 import { AuthType } from '../../../lib/types'
 
@@ -36,7 +35,6 @@ const ConfirmationEmail: React.FC = () => {
         const { user, token } = await fetchJson<AuthType>(`/api/u/confirmation-email/${confirmationToken}`, {
           method: 'POST'
         })
-        setShowLoading(false)
         localStorage.setItem('user', JSON.stringify(user))
         localStorage.setItem('token', JSON.stringify(token))
         dialogActions.open(
@@ -46,7 +44,7 @@ const ConfirmationEmail: React.FC = () => {
             most important stories. Enjoy!
           </>
         )
-        router.push('/a/my-libary')
+        router.push('/a/my-library')
       } catch (error) {
         // @ts-ignore
         const { data } = error
