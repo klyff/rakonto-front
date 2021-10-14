@@ -22,7 +22,7 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     background: {
-      paper: '#1D2120',
+      paper: '#141414',
       default: '#1D2120'
     },
     primary: {

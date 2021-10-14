@@ -14,13 +14,16 @@ import {
 import Player from '../../../../components/Player'
 import Cover from '../../../../components/Cover'
 import Box from '@mui/material/Box'
-import TabsArea from './TabsArea'
 import About from './About'
 import TabPanel from '@mui/lab/TabPanel'
 import Peoples from './Peoples'
 import Timelines from './Timelines'
 import withSession from '../../../../lib/withSession'
 import fetchJson from '../../../../lib/fetchJson'
+import Stories from './Stories'
+import TabContext from '@mui/lab/TabContext'
+import TabList from '@mui/lab/TabList'
+import Tab from '@mui/material/Tab'
 
 interface iCollection {
   collection: CollectionType
@@ -33,12 +36,17 @@ interface iCollection {
 
 const Collection: NextPage<iCollection> = ({ collection, timelineEntries, persons }) => {
   const [play, setPlay] = useState<boolean>(false)
+  const [tab, setTab] = useState<string>('')
   const [selectedStory, setSelectedStory] = useState<StoryType | undefined>()
   const { thumbnail, title, description, stories, id } = collection
 
   const handlePlay = () => {
     setSelectedStory(collection.stories[0])
     setPlay(true)
+  }
+
+  const onTabClick = (tab = '') => {
+    setTab(tab)
   }
 
   return (
@@ -53,12 +61,12 @@ const Collection: NextPage<iCollection> = ({ collection, timelineEntries, person
       <Box
         sx={{
           width: '100%',
-          maxHeight: `720px`,
+          height: `100%`,
           display: 'flex',
           flexFlow: 'column'
         }}
       >
-        <Box sx={{ width: '100%', height: '100%', margin: `8px 0` }}>
+        <Box sx={{ width: '100%', height: '100%' }}>
           {play ? (
             <Player
               subtitles={selectedStory?.subtitles || []}
@@ -78,28 +86,54 @@ const Collection: NextPage<iCollection> = ({ collection, timelineEntries, person
           )}
         </Box>
         <Box
+          component={TabContext}
+          value={(tab as string) || 'stories'}
           sx={{
-            width: '100%'
+            width: '100%',
+            height: '100%'
           }}
         >
-          <TabsArea>
-            <TabPanel value="stories">
-              <Peoples persons={persons} />
-            </TabPanel>
-            <TabPanel value="about">
-              <About title={title} description={description} />
-            </TabPanel>
-            <TabPanel value="peoples">
-              <Peoples persons={persons} />
-            </TabPanel>
-            <TabPanel value="timelines">
-              <Timelines timelines={timelineEntries} />
-            </TabPanel>
-            <TabPanel value="places">places</TabPanel>
-            <TabPanel value="photos">photos</TabPanel>
-            <TabPanel value="files">files</TabPanel>
-            <TabPanel value="links">links</TabPanel>
-          </TabsArea>
+          <Box
+            component={TabList}
+            variant="scrollable"
+            sx={{
+              backgroundColor: 'background.paper',
+              boxShadow: 6
+            }}
+          >
+            <Tab label="Stories" value="stories" onClick={() => onTabClick('stories')} />
+            <Tab label="About" value="about" onClick={() => onTabClick('about')} />
+            <Tab label="Peoples" value="peoples" onClick={() => onTabClick('peoples')} />
+            <Tab label="Timelines" value="timelines" onClick={() => onTabClick('timelines')} />
+            <Tab label="Places" value="places" onClick={() => onTabClick('places')} />
+            <Tab label="Photos" value="photos" onClick={() => onTabClick('photos')} />
+            <Tab label="Files" value="files" onClick={() => onTabClick('files')} />
+            <Tab label="Links" value="links" onClick={() => onTabClick('links')} />
+          </Box>
+          <TabPanel sx={{ height: '100%' }} value="stories">
+            <Stories playing={'1234'} stories={stories} />
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="about">
+            <About title={title} description={description} />
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="peoples">
+            <Peoples persons={persons} />
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="timelines">
+            <Timelines timelines={timelineEntries} />
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="places">
+            places
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="photos">
+            photos
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="files">
+            files
+          </TabPanel>
+          <TabPanel sx={{ height: '100%' }} value="links">
+            links
+          </TabPanel>
         </Box>
       </Box>
     </>

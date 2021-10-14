@@ -5,7 +5,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   background-color: #1D2120;
-  height: 100%;
+  height: auto;
 }
 
 a {
@@ -15,4 +15,13 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+
+.line-clamp {
+  overflow: hidden;
+  text-overflow: Ellipsis;
+  -webkit-line-clamp: 3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
 }
