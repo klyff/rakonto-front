@@ -35,7 +35,7 @@ const Signup: NextPage = () => {
       // @ts-ignore
       const { data } = error
       if (data) {
-        if (error?.response?.data.code === '1001') {
+        if (data.code === '1001') {
           snackActions.open('Email is already taken.')
           return
         }

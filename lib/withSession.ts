@@ -4,6 +4,6 @@ import Cookies from 'cookies'
 export default (req: NextApiRequest, res: NextApiResponse) => {
   const cookies = new Cookies(req, res)
   const token = cookies.get('token')
-  if (!token) return { Authorization: null }
+  if (!token) return { Authorization: '' }
   return { Authorization: `Bearer ${token}` }
 }

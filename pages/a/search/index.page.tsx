@@ -13,7 +13,7 @@ import AuthenticatedLayout from '../../../components/layout/AuthenticatedLayout'
 const Search: NextPage = () => {
   const { loading, items, hasNextPage, error, loadMore } = usePageableRequest<StoryType>({
     size: 15,
-    request: api().getStories
+    url: '/a/stories'
   })
 
   const [sentryRef] = useInfiniteScroll({

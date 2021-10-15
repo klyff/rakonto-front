@@ -11,7 +11,7 @@ import Link from '@mui/material/Link'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import React, { useContext, useState } from 'react'
-import { SigninFormType } from '../../../lib/types'
+import { AuthType, SigninFormType } from '../../../lib/types'
 import fetchJson from '../../../lib/fetchJson'
 import { SimpleDialogContext } from '../../../components/SimpleDialog'
 import { SimpleSnackbarContext } from '../../../components/SimpleSnackbar'
@@ -49,7 +49,7 @@ const Signin: NextPage = () => {
   const handleSubmit = async ({ email, password }: SigninFormType) => {
     setLognin(true)
     try {
-      const userInfo = await fetchJson('/api/u/auth/signin', {
+      const userInfo = await fetchJson<AuthType>('/api/u/auth/signin', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
         headers: { 'Content-Type': 'application/json' }
@@ -133,7 +133,7 @@ const Signin: NextPage = () => {
                 Login
               </LoadingButton>
               <Box paddingTop={2.5}>
-                <Link href="/u/forgot-password">Forgot Password</Link>
+                <Link href="/u/forgot-password">Forgot Password?</Link>
               </Box>
             </Grid>
             <Grid item xs={12}>
