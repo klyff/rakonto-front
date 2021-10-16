@@ -10,6 +10,7 @@ import { FormDialogContext } from '../../../components/FormDialog'
 import { useRouter } from 'next/router'
 import fetchJson from '../../../lib/fetchJson'
 import { AuthType } from '../../../lib/types'
+import Cookies from 'js-cookie'
 
 const ConfirmationEmail: React.FC = () => {
   const router = useRouter()
@@ -32,11 +33,11 @@ const ConfirmationEmail: React.FC = () => {
     if (!confirmationToken) return
     const confirm = async () => {
       try {
-        const { user, token } = await fetchJson<AuthType>(`/api/u/confirmation-email/${confirmationToken}`, {
+        const userInfo = await fetchJson<AuthType>(`/api/u/confirmation-email/${confirmationToken}`, {
           method: 'POST'
         })
-        localStorage.setItem('user', JSON.stringify(user))
-        localStorage.setItem('token', JSON.stringify(token))
+        Cookies.set('token', userInfo.token)
+        Cookies.set('user', JSON.stringify(userInfo.user))
         dialogActions.open(
           'Welcome to Rakonto!',
           <>
@@ -47,8 +48,9 @@ const ConfirmationEmail: React.FC = () => {
         router.push('/a/my-library')
       } catch (error) {
         // @ts-ignore
-        const { data } = error
+        let { data } = error
         if (data) {
+          data = JSON.parse(data)
           if (data.code === '1003') {
             formDialogActions.open(
               'Expired link',

@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev2": "cross-env NODE_ENV=development PORT=3000 NODE_OPTIONS='--inspect' node server.js",
-    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "dev": "NODE_OPTIONS='--inspect' next dev -p 80",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 80",
     "lint": "next lint"
   },
   "dependencies": {

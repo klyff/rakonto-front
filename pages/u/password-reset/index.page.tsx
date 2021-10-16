@@ -31,8 +31,9 @@ const PasswordReset: React.FC = () => {
       router.push('/u/signin')
     } catch (error) {
       // @ts-ignore
-      const { data } = error
+      let { data } = error
       if (data) {
+        data = JSON.parse(data)
         if (data.code === '1003') {
           dialogActions.open('Password change', <>This link to change the password has expired. Please try again!</>)
           router.push('/u/signin')

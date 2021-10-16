@@ -7,12 +7,19 @@ import { usePageableRequest } from '../../../../components/hooks/usePageableRequ
 import Grid from '@mui/material/Grid'
 import Card from '../../../../components/Card'
 import CollectionCard from '../../../../components/CollectionCard'
+import { useRouter } from 'next/router'
 
 const CollectionsSlider: NextPage = () => {
+  const router = useRouter()
   const { loading, items, hasNextPage, error, loadMore } = usePageableRequest<CollectionType>({
     size: 15,
     url: '/api/a/collections'
   })
+
+  // @ts-ignore
+  if (error?.status === 401) {
+    router.push('/u/signin')
+  }
 
   const [sentryRef] = useInfiniteScroll({
     loading,

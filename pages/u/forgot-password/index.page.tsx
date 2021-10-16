@@ -27,9 +27,10 @@ const ForgotPassword: React.FC = () => {
       router.push('/u/signin')
     } catch (error) {
       // @ts-ignore
-      const { data } = error
+      let { data } = error
       if (data) {
-        snackActions.open(data)
+        data = JSON.parse(data)
+        snackActions.open(data.message)
         return
       }
       snackActions.open('Something was wrong! please try again.')

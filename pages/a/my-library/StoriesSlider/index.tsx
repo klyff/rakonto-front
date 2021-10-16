@@ -7,12 +7,19 @@ import useInfiniteScroll from '../../../../components/hooks/useInfiniteScrool'
 import { usePageableRequest } from '../../../../components/hooks/usePageableRequest'
 import Card from '../../../../components/Card'
 import StoryCard from '../../../../components/StoryCard'
+import { useRouter } from 'next/router'
 
 const StoriesSliderTile: NextPage = () => {
+  const router = useRouter()
   const { loading, items, hasNextPage, error, loadMore } = usePageableRequest<StoryType>({
     size: 15,
     url: '/api/a/stories'
   })
+
+  // @ts-ignore
+  if (error?.status === 401) {
+    router.push('/u/signin')
+  }
 
   const [sentryRef] = useInfiniteScroll({
     loading,

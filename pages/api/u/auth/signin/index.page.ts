@@ -13,8 +13,6 @@ export default async (req: NextApiRequest, res: NextApiResponse<AuthType>) => {
     res.status(200).json(userInfo)
   } catch (error) {
     // @ts-ignore
-    const { response: fetchResponse } = error
-    // @ts-ignore
-    res.status(fetchResponse?.status || 500).json(error.data)
+    res.status(error?.status || 500).json(error.data)
   }
 }

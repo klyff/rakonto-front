@@ -21,7 +21,6 @@ import Cookies from 'js-cookie'
 
 const Signin: NextPage = () => {
   const router = useRouter()
-  const [logging, setLognin] = useState<boolean>(false)
   const { actions: dialogActions } = useContext(SimpleDialogContext)
   const { actions: snackActions } = useContext(SimpleSnackbarContext)
 
@@ -47,14 +46,13 @@ const Signin: NextPage = () => {
   }
 
   const handleSubmit = async ({ email, password }: SigninFormType) => {
-    setLognin(true)
     try {
       const userInfo = await fetchJson<AuthType>('/api/u/auth/signin', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
         headers: { 'Content-Type': 'application/json' }
       })
-      await Cookies.set('token', userInfo.token)
+      Cookies.set('token', userInfo.token)
       Cookies.set('user', JSON.stringify(userInfo.user))
       if (router.query.returnUrl) {
         await router.push(router.query.returnUrl as string)
@@ -63,8 +61,9 @@ const Signin: NextPage = () => {
       await router.push('/a/my-library')
     } catch (error) {
       // @ts-ignore
-      const { data } = error
+      let { data } = error
       if (data) {
+        data = JSON.parse(data)
         if (data.code === '1004') {
           snackActions.open('Email or password are incorrect. Please try again')
           return
@@ -87,7 +86,6 @@ const Signin: NextPage = () => {
       }
       snackActions.open('Something was wrong! please try again.')
     }
-    setLognin(false)
   }
 
   const initialValues: SigninFormType = { email: '', password: '' }

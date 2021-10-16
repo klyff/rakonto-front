@@ -9,11 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<void>) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     })
-    res.status(200)
+    res.status(201).end()
   } catch (error) {
     // @ts-ignore
-    const { response: fetchResponse } = error
-    // @ts-ignore
-    res.status(fetchResponse?.status || 500).json(error.data)
+    res.status(error?.status || 500).json(error.data)
   }
 }

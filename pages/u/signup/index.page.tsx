@@ -32,9 +32,11 @@ const Signup: NextPage = () => {
         cancelText: 'Close'
       })
     } catch (error) {
+      console.log(error)
       // @ts-ignore
-      const { data } = error
+      let { data } = error
       if (data) {
+        data = JSON.parse(data)
         if (data.code === '1001') {
           snackActions.open('Email is already taken.')
           return
