@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { forwardRef } from 'react'
 import Box from '@mui/material/Box'
+import Theme from './Theme'
 
 import 'video.js/dist/video-js.css'
 import '@silvermine/videojs-quality-selector/dist/css/quality-selector.css'
@@ -28,7 +29,9 @@ const Video = forwardRef<HTMLVideoElement, { preview?: string }>(({ preview, ...
       }
     }
   }
-  return <Box sx={sx} component="video" {...props} ref={ref} className="video-js vjs-big-play-centered" />
+  return (
+    <Box sx={sx} component="video" {...props} ref={ref} className="video-js vjs-theme-fantasy vjs-big-play-centered" />
+  )
 })
 
 export const VideoJS: React.FC<iVideoJs> = ({ options, handleEnd, onReady, type, preview }) => {
@@ -79,10 +82,12 @@ export const VideoJS: React.FC<iVideoJs> = ({ options, handleEnd, onReady, type,
   }, [])
 
   return (
-    <div data-vjs-player>
-      {type === 'video' && <Video preview={preview} ref={videoRef} />}
-      {type === 'audio' && <audio ref={videoRef} className="video-js vjs-big-play-centered" />}
-    </div>
+    <Theme>
+      <div data-vjs-player>
+        {type === 'video' && <Video preview={preview} ref={videoRef} />}
+        {type === 'audio' && <audio ref={videoRef} className="video-js vjs-big-play-centered" />}
+      </div>
+    </Theme>
   )
 }
 

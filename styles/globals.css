@@ -17,7 +17,6 @@ a {
   box-sizing: border-box;
 }
 
-
 .line-clamp {
   overflow: hidden;
   text-overflow: Ellipsis;

@@ -53,8 +53,7 @@ const Player: React.FC<iVideoPlayer> = ({
   const options: VideoJsPlayerOptions = {
     poster: cover,
     controls: true,
-    fluid: true,
-    aspectRatio: '16:9',
+    fill: true,
     muted: autoplay,
     autoplay: autoplay,
     tracks: subtitles.map(subtitle => ({
@@ -99,7 +98,7 @@ const Player: React.FC<iVideoPlayer> = ({
         return acc
       }, [] as PlaySource[])
     return (
-      <Box maxWidth={1280} maxHeight={720} margin={'0 auto'}>
+      <Box maxHeight={720} height={720}>
         <VideoJsWrapper handleEnd={handleEnd} preview={getGif()} options={options} />
       </Box>
     )
