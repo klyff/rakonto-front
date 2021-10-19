@@ -12,6 +12,7 @@ interface iVideoPlayer {
   type?: MediaType
   subtitles: SubtitleType[]
   autoplay?: boolean
+  handleEnd?: () => void
 }
 
 type PlaySource = {
@@ -40,13 +41,21 @@ const sortByRes = (a: any, b: any) => {
   return 0
 }
 
-const Player: React.FC<iVideoPlayer> = ({ autoplay, subtitles, media, type, defaultRes = '720p', cover }) => {
+const Player: React.FC<iVideoPlayer> = ({
+  autoplay,
+  handleEnd,
+  subtitles,
+  media,
+  type,
+  defaultRes = '720p',
+  cover
+}) => {
   const options: VideoJsPlayerOptions = {
     poster: cover,
     controls: true,
     fluid: true,
     aspectRatio: '16:9',
-    muted: false,
+    muted: autoplay,
     autoplay: autoplay,
     tracks: subtitles.map(subtitle => ({
       // If develop mode need replace proxy port = subtitle.url.replace('8080', '3000')
@@ -91,7 +100,7 @@ const Player: React.FC<iVideoPlayer> = ({ autoplay, subtitles, media, type, defa
       }, [] as PlaySource[])
     return (
       <Box maxWidth={1280} maxHeight={720} margin={'0 auto'}>
-        <VideoJsWrapper preview={getGif()} options={options} />
+        <VideoJsWrapper handleEnd={handleEnd} preview={getGif()} options={options} />
       </Box>
     )
   }
@@ -109,7 +118,7 @@ const Player: React.FC<iVideoPlayer> = ({ autoplay, subtitles, media, type, defa
     }, [] as PlaySource[])
     return (
       <Box maxWidth={1280} maxHeight={720} margin={'0 auto'}>
-        <AudioJsWrapper id={media?.id || ''} options={options} />
+        <AudioJsWrapper handleEnd={handleEnd} id={media?.id || ''} options={options} />
       </Box>
     )
   }

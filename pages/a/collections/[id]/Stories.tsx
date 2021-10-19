@@ -6,13 +6,17 @@ import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/router'
 
 interface iStory {
   story: StoryType
+  collectionId: string
   playing: boolean
+  isSelected: boolean
 }
 
-const StoryTile: React.FC<iStory> = ({ story, playing }) => {
+const StoryTile: React.FC<iStory> = ({ story, collectionId, playing, isSelected }) => {
+  const router = useRouter()
   const [hover, setHover] = useState<boolean>(false)
 
   return (
@@ -24,7 +28,7 @@ const StoryTile: React.FC<iStory> = ({ story, playing }) => {
           sx={{ position: 'relative', width: 327, height: 200 }}
         >
           <Image layout="fill" src={story.thumbnail} alt={story.title} />
-          {playing && (
+          {isSelected && (
             <>
               <Box
                 sx={{
@@ -51,11 +55,11 @@ const StoryTile: React.FC<iStory> = ({ story, playing }) => {
                   alignItems: 'center'
                 }}
               >
-                <PlayArrowIcon color="inherit" /> {hover && 'Playing'}
+                <PlayArrowIcon color="inherit" /> {playing && 'Playing'}
               </Box>
             </>
           )}
-          {!playing && hover && (
+          {!isSelected && hover && (
             <Button
               variant="contained"
               sx={{
@@ -65,6 +69,7 @@ const StoryTile: React.FC<iStory> = ({ story, playing }) => {
                 transform: 'translate(-50%, -50%)',
                 padding: '20px 16px'
               }}
+              onClick={() => router.push(`/a/collections/${collectionId}?storyId=${story.id}`)}
             >
               <PlayArrowIcon />
             </Button>
@@ -75,6 +80,7 @@ const StoryTile: React.FC<iStory> = ({ story, playing }) => {
         sx={{
           display: 'flex',
           flexFlow: 'column',
+          width: '100%',
           padding: 3,
           backgroundColor: playing ? 'action.selected' : 'default'
         }}
@@ -97,15 +103,23 @@ const StoryTile: React.FC<iStory> = ({ story, playing }) => {
 }
 
 interface iStories {
+  collectionId: string
   stories: StoryType[]
-  playing: string
+  playing: boolean
+  selectedStory: string
 }
 
-const Stories: React.FC<iStories> = ({ stories, playing }) => {
+const Stories: React.FC<iStories> = ({ selectedStory, collectionId, stories, playing }) => {
   return (
     <Box sx={{ display: 'flex', flexFlow: 'column', height: '100%' }}>
       {stories.map(story => (
-        <StoryTile key={story.id} story={story} playing={story.id === playing} />
+        <StoryTile
+          collectionId={collectionId}
+          key={story.id}
+          story={story}
+          isSelected={story.id === selectedStory}
+          playing={playing}
+        />
       ))}
     </Box>
   )

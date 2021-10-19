@@ -15,6 +15,7 @@ interface iVideoJs {
   onReady?: any
   type: 'audio' | 'video'
   preview?: string
+  handleEnd?: () => void
 }
 
 // eslint-disable-next-line react/display-name
@@ -30,7 +31,7 @@ const Video = forwardRef<HTMLVideoElement, { preview?: string }>(({ preview, ...
   return <Box sx={sx} component="video" {...props} ref={ref} className="video-js vjs-big-play-centered" />
 })
 
-export const VideoJS: React.FC<iVideoJs> = ({ options, onReady, type, preview }) => {
+export const VideoJS: React.FC<iVideoJs> = ({ options, handleEnd, onReady, type, preview }) => {
   const videoRef = React.useRef(null)
   const playerRef = React.useRef<VideoJsPlayer | null>(null)
 
@@ -41,8 +42,23 @@ export const VideoJS: React.FC<iVideoJs> = ({ options, onReady, type, preview })
       if (!videoElement) return
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
-        console.log('player is ready')
         onReady && onReady(player)
+        if (options.autoplay) {
+          const promise = player.play()
+
+          if (promise !== undefined) {
+            promise
+              .then(function () {
+                // Autoplay started!
+                console.log('Autoplay started!')
+              })
+              .catch(function (error) {
+                // Autoplay was prevented.
+                console.log('Autoplay was prevented!')
+              })
+          }
+        }
+        handleEnd && player.on('ended', handleEnd)
       }))
     } else {
       // you can update player here [update player through props]

@@ -1,5 +1,4 @@
 import React from 'react'
-import { api } from '../../../../lib/api'
 import { NextPage } from 'next'
 import { CollectionType } from '../../../../lib/types'
 import useInfiniteScroll from '../../../../components/hooks/useInfiniteScrool'

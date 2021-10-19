@@ -26,6 +26,8 @@ import TabList from '@mui/lab/TabList'
 import Tab from '@mui/material/Tab'
 
 interface iCollection {
+  story: StoryType
+  autoplay: boolean
   collection: CollectionType
   persons: PersonType[]
   files: FileType[]
@@ -34,14 +36,12 @@ interface iCollection {
   timelineEntries: TimelineType[]
 }
 
-const Collection: NextPage<iCollection> = ({ collection, timelineEntries, persons }) => {
-  const [play, setPlay] = useState<boolean>(false)
+const Collection: NextPage<iCollection> = ({ autoplay, collection, story, timelineEntries, persons }) => {
+  const [play, setPlay] = useState<boolean>(autoplay)
   const [tab, setTab] = useState<string>('')
-  const [selectedStory, setSelectedStory] = useState<StoryType | undefined>()
   const { thumbnail, title, description, stories, id } = collection
 
   const handlePlay = () => {
-    setSelectedStory(collection.stories[0])
     setPlay(true)
   }
 
@@ -69,11 +69,12 @@ const Collection: NextPage<iCollection> = ({ collection, timelineEntries, person
         <Box sx={{ width: '100%', height: '100%' }}>
           {play ? (
             <Player
-              subtitles={selectedStory?.subtitles || []}
-              type={selectedStory?.type}
-              media={selectedStory?.video || selectedStory?.audio}
-              cover={selectedStory?.thumbnail}
-              autoplay
+              handleEnd={() => console.log('end')}
+              subtitles={story?.subtitles || []}
+              type={story?.type}
+              media={story?.video || story?.audio}
+              cover={story?.thumbnail}
+              autoplay={autoplay}
             />
           ) : (
             <Cover
@@ -111,7 +112,7 @@ const Collection: NextPage<iCollection> = ({ collection, timelineEntries, person
             <Tab label="Links" value="links" onClick={() => onTabClick('links')} />
           </Box>
           <TabPanel sx={{ height: '100%' }} value="stories">
-            <Stories playing={'1234'} stories={stories} />
+            <Stories collectionId={id} selectedStory={story.id} playing={play} stories={stories} />
           </TabPanel>
           <TabPanel sx={{ height: '100%' }} value="about">
             <About title={title} description={description} />
@@ -145,7 +146,7 @@ Collection.getLayout = function getLayout(page) {
   return <AuthenticatedLayout>{page}</AuthenticatedLayout>
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, resolvedUrl, req, res }) => {
   // @ts-ignore
   const { Authorization } = withSession(req, res)
 
@@ -157,47 +158,80 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
       }
     }
   }
+  try {
+    const collection = await fetchJson<CollectionType>(
+      // @ts-ignore
+      `${process.env.NEXT_PUBLIC_LOCAL_CONTEXT}/api/a/collections/${params.id}`,
+      {
+        method: 'GET',
+        headers: { Authorization }
+      }
+    )
 
-  const collection = await fetchJson<CollectionType>(
-    // @ts-ignore
-    `${process.env.NEXT_PUBLIC_LOCAL_CONTEXT}/api/a/collections/${params.id}`,
-    {
-      method: 'GET',
-      headers: { Authorization }
+    if (!query.storyId) {
+      return {
+        redirect: {
+          statusCode: 301,
+          destination: `${resolvedUrl}?storyId=${collection.stories[0].id}`
+        }
+      }
     }
-  )
 
-  if (!collection) {
+    if (!collection) {
+      return {
+        notFound: true
+      }
+    }
+
+    const accumulator = collection?.stories?.reduce<{
+      persons: PersonType[]
+      files: FileType[]
+      links: LinkType[]
+      galleryEntries: GalleryType[]
+      timelineEntries: TimelineType[]
+    }>(
+      (acc, story) => {
+        acc.timelineEntries.push(...story.timelineEntries)
+        acc.files.push(...story.files)
+        acc.links.push(...story.links)
+        acc.galleryEntries.push(...story.galleryEntries)
+        acc.persons.push(...story.persons)
+        return acc
+      },
+      {
+        persons: [],
+        files: [],
+        links: [],
+        galleryEntries: [],
+        timelineEntries: []
+      }
+    )
+
+    const story = collection.stories.find(story => story.id === query.storyId)
+
     return {
-      notFound: true
+      props: {
+        autoplay: query.autoplay || false,
+        story,
+        collection,
+        ...accumulator
+      }
+    }
+  } catch (error) {
+    // @ts-ignore
+    if (error.status === 403) {
+      return {
+        redirect: {
+          statusCode: 301,
+          destination: '/403'
+        }
+      }
     }
   }
 
-  const accumulator = collection.stories.reduce<{
-    persons: PersonType[]
-    files: FileType[]
-    links: LinkType[]
-    galleryEntries: GalleryType[]
-    timelineEntries: TimelineType[]
-  }>(
-    (acc, story) => {
-      acc.timelineEntries.push(...story.timelineEntries)
-      acc.files.push(...story.files)
-      acc.links.push(...story.links)
-      acc.galleryEntries.push(...story.galleryEntries)
-      acc.persons.push(...story.persons)
-      return acc
-    },
-    {
-      persons: [],
-      files: [],
-      links: [],
-      galleryEntries: [],
-      timelineEntries: []
-    }
-  )
-
-  return { props: { collection, ...accumulator } }
+  return {
+    notFound: true
+  }
 }
 
 export default Collection

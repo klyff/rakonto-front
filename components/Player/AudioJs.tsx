@@ -2,7 +2,11 @@ import React from 'react'
 import { VideoJsPlayerOptions } from 'video.js'
 import VideoJS from '../VideoJS'
 
-const AudioJsWrapper: React.FC<{ options: VideoJsPlayerOptions; id: string }> = ({ options, id }) => {
+const AudioJsWrapper: React.FC<{ options: VideoJsPlayerOptions; id: string; handleEnd?: () => void }> = ({
+  options,
+  handleEnd,
+  id
+}) => {
   const _options = {
     ...options
     // plugins: {
@@ -19,7 +23,7 @@ const AudioJsWrapper: React.FC<{ options: VideoJsPlayerOptions; id: string }> = 
     // }
   }
 
-  return <VideoJS options={_options} type="audio" />
+  return <VideoJS handleEnd={handleEnd} options={_options} type="audio" />
 }
 
 export default AudioJsWrapper

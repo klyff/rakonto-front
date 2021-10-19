@@ -45,7 +45,7 @@ const Story: NextPage<iStory> = ({ story }) => {
           }}
         >
           <About description={description} owner={owner} title={title} collections={collections} />
-          <Comments comments={comments} watchers={watchers} storyId={id} />
+          {/*<Comments comments={comments} watchers={watchers} storyId={id} />*/}
           <TabsArea story={story} />
         </Box>
       </Box>
@@ -71,15 +71,29 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
     }
   }
 
-  // @ts-ignore
-  const story = await fetchJson<StoryType>(`${process.env.NEXT_PUBLIC_LOCAL_CONTEXT}/api/a/stories/${params.id}`, {
-    method: 'GET',
-    headers: { Authorization }
-  })
+  let story = null
 
-  if (!story) {
-    return {
-      notFound: true
+  try {
+    // @ts-ignore
+    story = await fetchJson<StoryType>(`${process.env.NEXT_PUBLIC_LOCAL_CONTEXT}/api/a/stories/${params.id}`, {
+      method: 'GET',
+      headers: { Authorization }
+    })
+
+    if (!story) {
+      return {
+        notFound: true
+      }
+    }
+  } catch (error) {
+    // @ts-ignore
+    if (error.status === 403) {
+      return {
+        redirect: {
+          statusCode: 301,
+          destination: '/403'
+        }
+      }
     }
   }
 

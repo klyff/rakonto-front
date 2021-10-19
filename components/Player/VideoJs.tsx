@@ -3,7 +3,11 @@ import { VideoJsPlayerOptions } from 'video.js'
 
 import VideoJS from '../VideoJS'
 
-const VideoJsWrapper: React.FC<{ options: VideoJsPlayerOptions; preview?: string }> = ({ options, preview }) => {
+const VideoJsWrapper: React.FC<{ options: VideoJsPlayerOptions; preview?: string; handleEnd?: () => void }> = ({
+  options,
+  preview,
+  handleEnd
+}) => {
   const _options = {
     ...options,
     controlBar: {
@@ -12,7 +16,7 @@ const VideoJsWrapper: React.FC<{ options: VideoJsPlayerOptions; preview?: string
     }
   }
 
-  return <VideoJS preview={preview} options={_options} type="video" />
+  return <VideoJS handleEnd={handleEnd} preview={preview} options={_options} type="video" />
 }
 
 export default VideoJsWrapper
