@@ -6,26 +6,28 @@ import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import initials from 'initials'
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js'
 import { MentionData } from '@draft-js-plugins/mention'
 import useUser from '../hooks/useUser'
 import { SimpleSnackbarContext } from '../SimpleSnackbar'
-import ShowMore from '../ShowMore'
 import EditorWithMentions from './EditorWithMentions'
 import { AxiosError } from 'axios'
 import { formatDistance, parseJSON } from 'date-fns'
+import CommentBox from './CommentBox'
 
 interface iComments {
   mentions?: MentionData[]
   comment: CommentType
   id: string
+  type: 'collection' | 'story'
   deleteComment: (commentId: string) => void
   editComment: (commentId: string, data: CommentFormType) => Promise<void>
 }
 
-const Comment: React.FC<iComments> = ({ comment, editComment, deleteComment, mentions, id }) => {
+const Comment: React.FC<iComments> = ({ comment, type, editComment, deleteComment, mentions, id }) => {
   const { author } = comment
   const { actions: snackActions } = useContext(SimpleSnackbarContext)
   const user = useUser()
@@ -56,7 +58,8 @@ const Comment: React.FC<iComments> = ({ comment, editComment, deleteComment, men
       const content = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       await editComment(comment.id, {
         body: content,
-        storyId: id,
+        commentableId: id,
+        commentableType: type,
         parentId: comment.parentId
       })
       setIsEditing(false)
@@ -93,48 +96,55 @@ const Comment: React.FC<iComments> = ({ comment, editComment, deleteComment, men
               <Typography variant="subtitle2" component="span">
                 {fullname}
               </Typography>{' '}
-              <Typography component="span" variant="caption">
+              <Typography component="div" variant="caption">
                 {formatDistance(parseJSON(comment.updatedAt), new Date(), { addSuffix: true })}
               </Typography>
             </>
           }
           secondary={
             isEditing ? (
-              <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} />
+              <CommentBox>
+                <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} />
+              </CommentBox>
             ) : (
-              <ShowMore lines={3}>
-                <EditorWithMentions readOnly={true} mentions={mentions} onChange={onChange} state={editorState} />
-              </ShowMore>
+              <EditorWithMentions readOnly={true} mentions={mentions} onChange={onChange} state={editorState} />
             )
           }
         />
-        {isOwner && (
-          <>
-            {isEditing ? (
-              <>
-                <Button onClick={handleSave}>Save</Button>
-                <Button onClick={handleCancel}>Cancel</Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={() => {
-                    handleEdit()
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  onClick={() => {
-                    handleDelete(comment.id)
-                  }}
-                >
-                  Delete
-                </Button>
-              </>
-            )}
-          </>
-        )}
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 0
+          }}
+        >
+          {isOwner && (
+            <>
+              {isEditing ? (
+                <>
+                  <Button onClick={handleSave}>Save</Button>
+                  <Button onClick={handleCancel}>Cancel</Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => {
+                      handleEdit()
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleDelete(comment.id)
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </Box>
       </ListItem>
       <Divider />
     </>

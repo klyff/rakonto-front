@@ -1,5 +1,5 @@
 import React from 'react'
-import { CommentType, WatcherType } from '../../lib/types'
+import { WatcherType } from '../../lib/types'
 import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
@@ -8,15 +8,16 @@ import Comment from './Comment'
 import { useCommentApi } from './useCommentApi'
 import CommentEditor from './CommentEditor'
 import Divider from '@mui/material/Divider'
+import { LinearProgress } from '@mui/material'
 
 interface iComments {
-  comments: CommentType[]
+  id: string
+  type: 'collection' | 'story'
   watchers: WatcherType[]
-  storyId: string
 }
 
-const Comments: React.FC<iComments> = ({ storyId, comments: initialComments, watchers }) => {
-  const { createComment, deleteComment, editComment, comments } = useCommentApi(storyId, initialComments)
+const Comments: React.FC<iComments> = ({ id, watchers, type }) => {
+  const { createComment, deleteComment, editComment, comments, isLoading } = useCommentApi(id, type)
 
   const mentions = watchers
     ?.filter(w => w.user != null)
@@ -37,12 +38,17 @@ const Comments: React.FC<iComments> = ({ storyId, comments: initialComments, wat
         height: '100%'
       }}
     >
-      <CommentEditor mentions={mentions} createAction={createComment} storyId={storyId} />
+      <Box component={Typography} sx={{ paddingBottom: 1 }}>
+        Add a comment
+      </Box>
+      <CommentEditor mentions={mentions} createAction={createComment} type={type} id={id} />
       <Divider sx={{ margin: '16px 0px' }} />
       <Typography>Comments</Typography>
+      {isLoading && <LinearProgress />}
       <List>
         {comments.map(comment => (
           <Comment
+            type={type}
             deleteComment={deleteComment}
             editComment={editComment}
             id={comment.id}

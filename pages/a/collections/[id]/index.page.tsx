@@ -115,7 +115,7 @@ const Collection: NextPage<iCollection> = ({ autoplay, collection, story, timeli
             <Stories collectionId={id} selectedStory={story.id} playing={play} stories={stories} />
           </TabPanel>
           <TabPanel sx={{ height: '100%' }} value="about">
-            <About title={title} description={description} />
+            <About title={title} collectionId={id} description={description} />
           </TabPanel>
           <TabPanel sx={{ height: '100%' }} value="peoples">
             <Peoples persons={persons} />

@@ -297,9 +297,10 @@ export type CommentType = {
 }
 
 export type CommentFormType = {
-  storyId: string
-  parentId?: string
+  commentableId: string
+  commentableType: 'collection' | 'story'
   body: string
+  parentId?: string
 }
 
 export type LocationSearchType = {

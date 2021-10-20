@@ -7,14 +7,16 @@ import { CommentFormType } from '../../../lib/types'
 import { MentionData } from '@draft-js-plugins/mention'
 import { SimpleSnackbarContext } from '../../SimpleSnackbar'
 import { AxiosError } from 'axios'
+import CommentBox from '../CommentBox'
 
 interface iCommentEditor {
   createAction: (comment: CommentFormType) => void
   mentions?: MentionData[]
-  storyId: string
+  id: string
+  type: 'story' | 'collection'
 }
 
-const CommentEditor: React.FC<iCommentEditor> = ({ storyId, mentions, createAction }) => {
+const CommentEditor: React.FC<iCommentEditor> = ({ id, mentions, type, createAction }) => {
   const { actions: snackActions } = useContext(SimpleSnackbarContext)
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
@@ -22,7 +24,8 @@ const CommentEditor: React.FC<iCommentEditor> = ({ storyId, mentions, createActi
     try {
       await createAction({
         body: JSON.stringify(convertToRaw(editorState.getCurrentContent())),
-        storyId
+        commentableId: id,
+        commentableType: type
       })
       setEditorState(EditorState.createEmpty())
     } catch (error) {
@@ -43,7 +46,9 @@ const CommentEditor: React.FC<iCommentEditor> = ({ storyId, mentions, createActi
 
   return (
     <>
-      <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} />
+      <CommentBox>
+        <EditorWithMentions mentions={mentions} onChange={onChange} state={editorState} />
+      </CommentBox>
       <Box sx={{ display: 'flex', justifyContent: 'end' }}>
         <Button variant="outlined" onClick={handleSave}>
           Comment

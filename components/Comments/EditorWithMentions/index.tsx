@@ -3,9 +3,6 @@ import createMentionPlugin, { defaultSuggestionsFilter, MentionData } from '@dra
 import Entry from './Entry'
 import Editor from '@draft-js-plugins/editor'
 import { EditorState } from 'draft-js'
-import CommentBox from './CommentBox'
-import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
 
 interface iMention {
   mentions?: MentionData[]
@@ -13,12 +10,6 @@ interface iMention {
   onChange: (state: EditorState) => void
   readOnly?: boolean
 }
-
-const DraftField = React.forwardRef<Editor, any>(function DraftField(props, ref) {
-  const { component: Component, editorRef, handleOnChange, ...rest } = props
-
-  return <Component {...rest} ref={editorRef} onChange={handleOnChange} />
-})
 
 const EditorWithMentions: React.FC<iMention> = React.forwardRef<Editor, iMention>(
   ({ mentions, state, onChange, readOnly }) => {
@@ -62,19 +53,14 @@ const EditorWithMentions: React.FC<iMention> = React.forwardRef<Editor, iMention
             ref?.current?.focus()
           }}
         >
-          <Box component={Typography} sx={{ paddingBottom: 1 }}>
-            Add a comment
-          </Box>
-          <CommentBox>
-            <Editor
-              readOnly={readOnly}
-              editorKey="editor"
-              editorState={state}
-              onChange={onChange}
-              plugins={plugins}
-              ref={ref}
-            />
-          </CommentBox>
+          <Editor
+            readOnly={readOnly}
+            editorKey="editor"
+            editorState={state}
+            onChange={onChange}
+            plugins={plugins}
+            ref={ref}
+          />
           {mentionComponent}
         </div>
       </>

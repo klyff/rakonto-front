@@ -21,11 +21,11 @@ const Theme = styled('div')(
       left: 50%;
       margin-top: -35px;
       margin-left: -35px;
-      color: black;
+      color: ${theme.palette.common.black}
     }
 
     & > .vjs-theme-fantasy.vjs-big-play-button:focus, & > .vjs-theme-fantasy:hover .vjs-big-play-button {
-      color:  var(--vjs-theme-fantasy--secondary);
+      color: ${theme.palette.common.black}
     }
 
     & > .vjs-theme-fantasy .vjs-control-bar {

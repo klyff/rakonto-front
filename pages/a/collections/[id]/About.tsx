@@ -6,10 +6,11 @@ import Comments from '../../../../components/Comments'
 
 interface iAbout {
   title: string
+  collectionId: string
   description: string
 }
 
-const About: React.FC<iAbout> = ({ title, description }) => {
+const About: React.FC<iAbout> = ({ title, collectionId, description }) => {
   return (
     <Box
       sx={{
@@ -33,11 +34,11 @@ const About: React.FC<iAbout> = ({ title, description }) => {
       </Box>
       <Box
         sx={{
-          minWidth: '448px',
+          width: 500,
           paddingLeft: 1
         }}
       >
-        <Comments storyId={'123'} comments={[]} watchers={[]} />
+        <Comments type={'collection'} id={collectionId} watchers={[]} />
       </Box>
     </Box>
   )
