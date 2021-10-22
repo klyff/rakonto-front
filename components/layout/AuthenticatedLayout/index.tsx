@@ -1,12 +1,14 @@
 import React from 'react'
 import Header from './Header'
-import { MediaStatusProvider } from '../../../components/MediaStatus'
+import { StepStoryUploadProvider } from '../../StepStoryUpload'
 
 const AuthenticatedLayout: React.FC = ({ children }) => {
   return (
     <>
-      <Header />
-      {children}
+      <StepStoryUploadProvider>
+        <Header />
+        {children}
+      </StepStoryUploadProvider>
     </>
   )
 }

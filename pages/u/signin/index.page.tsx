@@ -91,7 +91,7 @@ const Signin: NextPage = () => {
   const initialValues: SigninFormType = { email: '', password: '' }
   return (
     <Formik initialValues={initialValues} validationSchema={schema} onSubmit={handleSubmit}>
-      {({ isSubmitting, values, handleChange, errors, touched }) => (
+      {({ isSubmitting, values, handleBlur, handleChange, errors, touched }) => (
         <Form>
           <Grid container spacing={4} direction="row" justifyContent="center" alignItems="center">
             <Grid item xs={12}>
@@ -102,6 +102,7 @@ const Signin: NextPage = () => {
                 label="Email address"
                 value={values.email}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 error={touched.email && Boolean(errors.email)}
                 helperText={touched.email && errors.email}
               />
@@ -115,6 +116,7 @@ const Signin: NextPage = () => {
                 type="password"
                 value={values.password}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
               />
