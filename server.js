@@ -1,6 +1,19 @@
 /* eslint-disable */
 const express = require('express')
+const { createProxyMiddleware } = require('http-proxy-middleware')
+const { createServer } = require('https')
+const { parse } = require('url')
 const next = require('next')
+const fs = require('fs')
+const port = 4000
+const dev = process.env.NODE_ENV !== 'production'
+const app = next({ dir: '.', dev })
+const handle = app.getRequestHandler()
+
+const httpsOptions = {
+  key: fs.readFileSync('./https-certs/localhost-key.pem'),
+  cert: fs.readFileSync('./https-certs/localhost.pem')
+}
 
 const devProxy = {
   '/api': {
@@ -9,41 +22,19 @@ const devProxy = {
   }
 }
 
-const port = parseInt(process.env.PORT, 10) || 3000
-const env = process.env.NODE_ENV
-const dev = env !== 'production'
-const app = next({
-  dir: '.', // base directory where everything is, could move to src later
-  dev
-})
+app.prepare().then(() => {
+  const xp = express();
 
-const handle = app.getRequestHandler()
-
-let server
-app
-  .prepare()
-  .then(() => {
-    server = express()
-
-    // Set up the proxy.
-    if (dev && devProxy) {
-      const { createProxyMiddleware } = require('http-proxy-middleware')
-      Object.keys(devProxy).forEach(function (context) {
-        server.use(context, createProxyMiddleware(devProxy[context]))
-      })
-    }
-
-    // Default catch-all handler to allow Next.js to handle all other routes
-    server.all('*', (req, res) => handle(req, res))
-
-    server.listen(port, err => {
-      if (err) {
-        throw err
-      }
-      console.log(`> Ready on port ${port} [${env}]`)
+  if (dev) {
+    Object.keys(devProxy).forEach(function (context) {
+      xp.use(context, createProxyMiddleware(devProxy[context]))
     })
+  }
+
+  xp.all('*', (req, res) => handle(req, res))
+
+  createServer(httpsOptions, xp).listen(port, (err) => {
+    if (err) throw err
+    console.log('ready - started server on url: https://localhost:' + port)
   })
-  .catch(err => {
-    console.log('An error occurred, unable to start the server')
-    console.log(err)
-  })
+})

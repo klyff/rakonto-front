@@ -7,6 +7,8 @@ import {
   updateMe,
   passwordReset,
   passwordChange,
+  signinGoogle,
+  signinFacebook,
   signin,
   confirmEmail,
   requestConfirmEmail,
@@ -74,7 +76,6 @@ request.interceptors.response.use(
     return response
   },
   error => {
-    console.log('error: ', error)
     if (typeof window === 'undefined') {
       return Promise.reject(error)
     }
@@ -105,6 +106,8 @@ export const api = (token?: string) => {
     passwordReset: passwordReset(request),
     passwordChange: passwordChange(request),
     signin: signin(request),
+    signinGoogle: signinGoogle(request),
+    signinFacebook: signinFacebook(request),
     confirmEmail: confirmEmail(request),
     requestConfirmEmail: requestConfirmEmail(request),
     searchStories: searchStories(request),

@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev2": "cross-env NODE_ENV=development PORT=3000 NODE_OPTIONS='--inspect' node server.js",
-    "dev": "NODE_OPTIONS='--inspect' next dev -p 4000",
+    "dev": "cross-env NODE_ENV=development PORT=4000 NODE_OPTIONS='--inspect' node server.js",
     "build": "next build",
     "start": "next start -p 4000",
     "lint": "next lint"

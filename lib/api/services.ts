@@ -66,6 +66,20 @@ export const singup =
     return response.data
   }
 
+export const signinGoogle =
+  (request: AxiosInstance) =>
+  async (data: SingupFormType): Promise<AuthType> => {
+    const response = await request.post('u/auth/google', data)
+    return response.data
+  }
+
+export const signinFacebook =
+  (request: AxiosInstance) =>
+  async (data: SingupFormType): Promise<AuthType> => {
+    const response = await request.post('u/auth/facebook', data)
+    return response.data
+  }
+
 export const singout = (request: AxiosInstance) => async (): Promise<unknown> => {
   const response = await request.post('a/auth/signout')
   return response.data
